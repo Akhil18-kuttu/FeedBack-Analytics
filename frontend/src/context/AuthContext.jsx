@@ -58,7 +58,9 @@ export const AuthProvider = ({ children }) => {
     } catch {
       // Ignore logout errors
     }
-    localStorage.clear();
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
     setUser(null);
   };
 

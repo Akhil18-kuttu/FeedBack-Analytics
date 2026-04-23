@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
@@ -9,9 +9,14 @@ import toast from 'react-hot-toast';
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { adminLogin } = useContext(AuthContext);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { adminLogin, user, loading } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  // Redirect if already logged in
+  if (user && !loading) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,7 +24,7 @@ export default function AdminLoginPage() {
       toast.error('Please enter email and password');
       return;
     }
-    setLoading(true);
+    setIsSubmitting(true);
     try {
       await adminLogin(email, password);
       toast.success('Welcome back, Admin!');
@@ -27,7 +32,7 @@ export default function AdminLoginPage() {
     } catch (err) {
       toast.error(err.response?.data?.message || 'Invalid admin credentials');
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -84,7 +89,7 @@ export default function AdminLoginPage() {
                 />
               </div>
             </div>
-            <Button type="submit" loading={loading} className="w-full">
+            <Button type="submit" loading={isSubmitting} className="w-full">
               Access Dashboard <ArrowRight className="w-4 h-4" />
             </Button>
           </form>

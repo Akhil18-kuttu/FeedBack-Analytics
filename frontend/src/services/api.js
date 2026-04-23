@@ -35,8 +35,10 @@ API.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           return API(originalRequest);
         } catch (refreshError) {
-          // Refresh failed — clear everything and redirect
-          localStorage.clear();
+          // Refresh failed — clear auth data and redirect
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('user');
           window.location.href = '/login';
           return Promise.reject(refreshError);
         }
