@@ -1,0 +1,40 @@
+services:
+  backend:
+    build: ./backend
+    container_name: tcs-project-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      feedback_db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: tcs-project-frontend
+    ports:
+     - "5173:5173"
+    depends_on:
+      - backend
+
+  feedback_db:
+    image: mysql:8.0
+    container_name: feedback_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootUser123
+      MYSQL_DATABASE: feedback_db
+    ports:
+     - "3307:3306"
+    volumes:
+      - feedback_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+
+volumes:
+  feedback_data:
